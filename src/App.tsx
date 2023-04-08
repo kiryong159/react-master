@@ -1,6 +1,7 @@
 import { createGlobalStyle } from "styled-components";
 import Router from "./routes/Router";
 import HelmetComponent from "./helmet";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const GlobalCss = createGlobalStyle`
 body {
@@ -24,6 +25,7 @@ function App() {
       <HelmetComponent />
       <GlobalCss />
       <Router />
+      <ReactQueryDevtools initialIsOpen={true} />
     </>
   );
 }

@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import {
   Link,
@@ -8,6 +9,7 @@ import {
   useRouteMatch,
 } from "react-router-dom";
 import styled from "styled-components";
+import { fetchCoinData, fetchPriceData } from "../api";
 import Chart from "./Chart";
 import { Container, Header, Title, LoadingText } from "./Coins";
 import Price from "./Price";
@@ -131,40 +133,33 @@ const Tap = styled.div<{ isActive: boolean }>`
 `;
 
 function Coin() {
-  const [loading, setLoading] = useState(true);
   const { coinId } = useParams<Coinprops>();
   const { state } = useLocation<RouteProps>();
-  const [coinInfoData, setCoinInfoData] = useState<CoinInfoProps>();
-  const [coinPriceData, setCoinPriceData] = useState<CoinPriceProps>();
+
+  const { data: coinInfoData, isLoading: infoLoading } =
+    useQuery<CoinInfoProps>(["coinInfoData", coinId], () =>
+      fetchCoinData(coinId)
+    );
+  const { data: coinPriceData, isLoading: priceLoading } =
+    useQuery<CoinPriceProps>(["coinPriceData", coinId], () =>
+      fetchPriceData(coinId)
+    );
+
   const priceMatch = useRouteMatch(`/${coinId}/price`);
   const chartMatch = useRouteMatch(`/${coinId}/chart`);
-  useEffect(() => {
-    (async () => {
-      const coinData = await (
-        await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)
-      ).json();
-      const priceData = await (
-        await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)
-      ).json();
-      setCoinInfoData(coinData);
-      setCoinPriceData(priceData);
-      setLoading(false);
-      console.log("coinData", coinData);
-      console.log("priceData", priceData);
-    })();
-  }, [coinId]);
+
   return (
     <Container>
       <Header>
         <Title>
           {state?.name
             ? state.name
-            : loading
+            : infoLoading
             ? "Loading..."
             : coinInfoData?.name}
         </Title>
       </Header>
-      {loading ? (
+      {priceLoading ? (
         <LoadingText>Loading...</LoadingText>
       ) : (
         <>
