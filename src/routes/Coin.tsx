@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
 import {
   Link,
   Route,
@@ -209,7 +208,7 @@ function Coin() {
             <Route
               path={`/${coinInfoData?.id ? coinInfoData.id : coinId}/chart`}
             >
-              <Chart />
+              <Chart coinId={coinId} />
             </Route>
           </Switch>
         </>
