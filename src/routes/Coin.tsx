@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet";
 import {
   Link,
   Route,
@@ -12,6 +13,8 @@ import { fetchCoinData, fetchPriceData } from "../api";
 import Chart from "./Chart";
 import { Container, Header, Title, LoadingText } from "./Coins";
 import Price from "./Price";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHouse } from "@fortawesome/free-solid-svg-icons";
 
 interface Coinprops {
   coinId: string;
@@ -101,6 +104,13 @@ const OverviewItem = styled.div`
 `;
 
 const Discription = styled.p``;
+const Home = styled.button`
+  margin-top: 15px;
+  background: none;
+  color: ${(props) => props.theme.textColor};
+  border: none;
+  font-size: 30px;
+`;
 
 const Taps = styled.div`
   display: flex;
@@ -140,15 +150,33 @@ function Coin() {
       fetchCoinData(coinId)
     );
   const { data: coinPriceData, isLoading: priceLoading } =
-    useQuery<CoinPriceProps>(["coinPriceData", coinId], () =>
-      fetchPriceData(coinId)
+    useQuery<CoinPriceProps>(
+      ["coinPriceData", coinId],
+      () => fetchPriceData(coinId),
+      { refetchInterval: 30000 }
     );
+  const priceData = coinPriceData;
 
   const priceMatch = useRouteMatch(`/${coinId}/price`);
   const chartMatch = useRouteMatch(`/${coinId}/chart`);
 
   return (
     <Container>
+      <Helmet>
+        <title>
+          {state?.name
+            ? state.name
+            : infoLoading
+            ? "Loading..."
+            : coinInfoData?.name}
+        </title>
+        <link
+          rel="icon"
+          href={`https://coinicons-api.vercel.app/api/icon/${coinInfoData?.symbol.toLowerCase()}`}
+          sizes="16x16"
+          type="image/png"
+        />
+      </Helmet>
       <Header>
         <Title>
           {state?.name
@@ -174,8 +202,12 @@ function Coin() {
               />
             </OverviewItem>
             <OverviewItem>
-              <span>OPENSOURCE</span>
-              <span>{coinInfoData?.open_source ? "YES" : "NO"}</span>
+              <span>PRICE</span>
+              <span>
+                {coinPriceData?.quotes.USD.price
+                  ? `${coinPriceData?.quotes.USD.price.toFixed(3)}$`
+                  : "NO"}
+              </span>
             </OverviewItem>
           </Overview>
           <Discription>{coinInfoData?.description}</Discription>
@@ -184,7 +216,13 @@ function Coin() {
               <span>TOTAL SUPLY</span>
               <span>{coinPriceData?.total_supply}</span>
             </OverviewItem>
-            <OverviewItem></OverviewItem>
+            <OverviewItem>
+              <Home>
+                <Link to={`/`}>
+                  <FontAwesomeIcon icon={faHouse} />
+                </Link>
+              </Home>
+            </OverviewItem>
             <OverviewItem>
               <span>MAX SUPLY</span>
               <span>{coinPriceData?.max_supply}</span>
@@ -203,7 +241,7 @@ function Coin() {
             <Route
               path={`/${coinInfoData?.id ? coinInfoData.id : coinId}/price`}
             >
-              <Price />
+              <Price priceData={priceData} />
             </Route>
             <Route
               path={`/${coinInfoData?.id ? coinInfoData.id : coinId}/chart`}

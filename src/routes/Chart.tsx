@@ -34,19 +34,40 @@ function Chart({ coinId }: ChartProps) {
               data: data?.map((price) => parseFloat(price.close)) ?? [],
             },
           ]}
-          type="line"
+          type="area"
           options={{
             stroke: { curve: "smooth" },
             theme: { mode: "dark" },
             chart: {
+              id: "area-datetime",
+              type: "area",
               toolbar: { show: false },
               width: 500,
               height: 300,
               background: "inherit",
             },
             grid: { show: false },
-            yaxis: { show: false },
-            xaxis: { axisTicks: { show: false }, labels: { show: false } },
+            yaxis: { show: true },
+            xaxis: {
+              axisTicks: { show: false },
+              labels: { show: false },
+              type: "datetime",
+              categories: data?.map((data) =>
+                new Date(data.time_close * 1000).toUTCString()
+              ),
+            },
+            dataLabels: {
+              enabled: false,
+            },
+            fill: {
+              type: "gradient",
+              colors: ["#1abc9c"],
+              gradient: {
+                gradientToColors: ["#3498db"],
+                stops: [0, 100],
+              },
+            },
+            tooltip: { y: { formatter: (value) => `${value.toFixed(1)}$` } },
           }}
         />
       )}
