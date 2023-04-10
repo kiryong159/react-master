@@ -76,6 +76,9 @@ interface CoinPriceProps {
     };
   };
 }
+interface ICoinProps {
+  isDark: boolean;
+}
 
 const Img = styled.img`
   width: 30px;
@@ -141,7 +144,7 @@ const Tap = styled.div<{ isActive: boolean }>`
   }
 `;
 
-function Coin() {
+function Coin({ isDark }: ICoinProps) {
   const { coinId } = useParams<Coinprops>();
   const { state } = useLocation<RouteProps>();
 
@@ -246,7 +249,7 @@ function Coin() {
             <Route
               path={`/${coinInfoData?.id ? coinInfoData.id : coinId}/chart`}
             >
-              <Chart coinId={coinId} />
+              <Chart coinId={coinId} isDark={isDark} />
             </Route>
           </Switch>
         </>

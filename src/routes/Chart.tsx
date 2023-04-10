@@ -4,6 +4,7 @@ import ApexChart from "react-apexcharts";
 
 interface ChartProps {
   coinId: string;
+  isDark: boolean;
 }
 
 interface IChartData {
@@ -17,7 +18,7 @@ interface IChartData {
   market_cap: number;
 }
 
-function Chart({ coinId }: ChartProps) {
+function Chart({ coinId, isDark }: ChartProps) {
   const { isLoading, data } = useQuery<IChartData[]>(
     [coinId, "chartData"],
     () => fetchCoinChart(coinId)
@@ -37,7 +38,7 @@ function Chart({ coinId }: ChartProps) {
           type="area"
           options={{
             stroke: { curve: "smooth" },
-            theme: { mode: "dark" },
+            theme: { mode: isDark ? "dark" : "light" },
             chart: {
               id: "area-datetime",
               type: "area",

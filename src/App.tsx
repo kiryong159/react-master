@@ -2,7 +2,9 @@ import { createGlobalStyle } from "styled-components";
 import Router from "./routes/Router";
 import HelmetComponent from "./helmet";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-
+import { ThemeProvider } from "styled-components";
+import { lightTheme, darkTheme } from "./theme";
+import { useState } from "react";
 const GlobalCss = createGlobalStyle`
 body {
   font-family: "Nunito", sans-serif;
@@ -20,12 +22,16 @@ a {
 `;
 
 function App() {
+  const [isDark, setIsDark] = useState(false);
+  const toggleMode = () => setIsDark((prev) => !prev);
   return (
     <>
-      <HelmetComponent />
-      <GlobalCss />
-      <Router />
-      <ReactQueryDevtools initialIsOpen={true} />
+      <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
+        <HelmetComponent />
+        <GlobalCss />
+        <Router isDark={isDark} toggleMode={toggleMode} />
+        <ReactQueryDevtools initialIsOpen={true} />
+      </ThemeProvider>
     </>
   );
 }
