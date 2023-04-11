@@ -1,8 +1,13 @@
+import { faSun } from "@fortawesome/free-regular-svg-icons";
+import { faMoon } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { fetchCoins } from "../api";
+import { isDarkAtom } from "../atoms";
 
 export const Title = styled.h1`
   color: ${(props) => props.theme.accentColor};
@@ -20,6 +25,14 @@ export const Header = styled.header`
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  button {
+    border: none;
+    font-size: 40px;
+    background-color: inherit;
+    position: absolute;
+    right: 20px;
+  }
 `;
 
 const CoinList = styled.ul``;
@@ -69,15 +82,14 @@ interface CoinInterface {
   type: string;
 }
 
-interface ICoinsprop {
-  toggleMode: () => void;
-}
-
-function Coins({ toggleMode }: ICoinsprop) {
+function Coins() {
   const { data, isLoading } = useQuery<CoinInterface[]>(
     ["allCoins"],
     fetchCoins
   );
+  const isDark = useRecoilValue(isDarkAtom);
+  const setDarkAtom = useSetRecoilState(isDarkAtom);
+  const toggleDarkAtom = () => setDarkAtom((prev) => !prev);
   return (
     <Container>
       <Helmet>
@@ -85,7 +97,13 @@ function Coins({ toggleMode }: ICoinsprop) {
       </Helmet>
       <Header>
         <Title>Coins</Title>
-        <button onClick={toggleMode}>Change Mode</button>
+        <button onClick={toggleDarkAtom}>
+          {isDark ? (
+            <FontAwesomeIcon icon={faSun} />
+          ) : (
+            <FontAwesomeIcon icon={faMoon} />
+          )}
+        </button>
       </Header>
       {isLoading ? (
         <LoadingText>Loading...</LoadingText>
